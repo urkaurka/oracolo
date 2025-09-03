@@ -1,12 +1,12 @@
 vector_store:
   persist_directory: "./chroma_db"
 
-embeddings:
-  model_name: "sentence-transformers/all-mpnet-base-v2"
-
 document_processor:
   chunk_size: 1000
   chunk_overlap: 200
+
+resources:
+  pdf_directory: "../resources"
 
 llm:
   model_name: "llama2"

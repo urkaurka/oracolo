@@ -1,9 +1,10 @@
 import logging
-import shutil
 from time import perf_counter
+from pathlib import Path
 
 from vector_store import VectorStore
 from document_processor import DocumentProcessor
+from config_manager import ConfigManager
 
 logger = logging.getLogger(__name__)
 
@@ -13,21 +14,23 @@ if __name__ == "__main__":
         level=logging.INFO)
     logger.info("start")
 
-    chroma_dir = "./chroma_db"
-    file_pdf = "../resources/Documento VN.pdf"
-
-    shutil.rmtree(chroma_dir)
+    # Load configuration
+    config = ConfigManager()
 
     ts = perf_counter()
-    vs = VectorStore(persist_directory=chroma_dir)
+    vs = VectorStore(persist_directory=config.chroma_dir)
+    vs.clear_database()
     logger.info(f"VectorStore creation: {perf_counter()-ts} sec")
 
     ts = perf_counter()
     dp = DocumentProcessor()
     logger.info(f"DocumentProcessor creation: {perf_counter()-ts} sec")
 
+    # Construct PDF path
+    pdf_path = Path(config.pdf_resources_dir) / "Documento VN.pdf"
+
     ts = perf_counter()
-    results = list(dp.process_large_pdf(file_pdf))
+    results = list(dp.process_large_pdf(str(pdf_path)))
     for enne, doc in enumerate(results):
         if enne % 10 == 0:
             logger.info(f'step {enne} / {len(results)}')
