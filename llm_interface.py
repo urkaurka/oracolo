@@ -7,18 +7,18 @@ class LLMInterface:
         self.prompt_template = PromptTemplate(
             input_variables=["context", "question"],
             template="""
-            Basandoti sul seguente contesto, rispondi alla domanda. 
-            Usa solo le informazioni fornite nel contesto.
+            Based on the following context, answer the question.
+            Use only information provided in the context.
             
-            Contesto:
+            Context:
             {context}
             
-            Domanda: {question}
+            Question: {question}
             
-            Risposta:"""
+            Answer:"""
         )
         self.chain = LLMChain(llm=self.llm, prompt=self.prompt_template)
 
     def get_response(self, context: str, question: str) -> str:
-        """Ottiene una risposta dall'LLM dato un contesto e una domanda"""
+        """Get a response from the LLM given a context and question"""
         return self.chain.run(context=context, question=question)

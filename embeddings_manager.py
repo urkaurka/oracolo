@@ -6,5 +6,5 @@ class EmbeddingsManager:
         self.embeddings = HuggingFaceEmbeddings(model_name=model_name)
 
     def get_embeddings(self, texts: List[str]) -> List[List[float]]:
-        """Genera embeddings per una lista di testi"""
+        """Generate embeddings for a list of texts"""
         return self.embeddings.embed_documents(texts)

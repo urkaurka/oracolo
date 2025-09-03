@@ -1,7 +1,8 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import TextLoader, PyPDFLoader
-from typing import List
+from typing import List, Generator
 from langchain.schema import Document
+
 
 class DocumentProcessor:
     def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
@@ -11,29 +12,32 @@ class DocumentProcessor:
         )
 
     def load_and_split(self, file_path: str) -> List[Document]:
-        """Carica un documento e lo divide in chunks"""
+        """Load a document and split it into chunks"""
         if file_path.lower().endswith('.pdf'):
             loader = PyPDFLoader(file_path)
         else:
             loader = TextLoader(file_path)
-            
+
         documents = loader.load()
         return self.text_splitter.split_documents(documents)
 
-    def process_large_pdf(self, file_path: str, batch_size: int = 100) -> None:
+    def process_large_pdf(self, file_path: str, batch_size: int = 100) -> Generator[List[Document], None, None]:
         """
-        Processa un PDF grande in batch per gestire meglio la memoria
+        Process a large PDF in batches to better manage memory
+
+        Args:
+            file_path: path to the PDF file
+            batch_size: size of each document batch
+
+        Yields:
+            List[Document]: batch of processed documents
         """
         if not file_path.lower().endswith('.pdf'):
-            raise ValueError("Il file deve essere un PDF")
-            
+            raise ValueError("File must be a PDF")
+
         loader = PyPDFLoader(file_path)
         documents = loader.load()
-        
-        # Processa il documento in batch
         for i in range(0, len(documents), batch_size):
             batch = documents[i:i + batch_size]
             chunks = self.text_splitter.split_documents(batch)
-            # Qui puoi aggiungere la logica per salvare i chunks
-            # Per esempio, passarli al vector store
             yield chunks
