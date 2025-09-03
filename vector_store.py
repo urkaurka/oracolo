@@ -1,7 +1,8 @@
-from langchain.vectorstores import Chroma
-from .embeddings_manager import EmbeddingsManager
-from typing import List
+from langchain_chroma import Chroma
 from langchain.schema import Document
+from chromadb.config import Settings
+
+from embeddings_manager import EmbeddingsManager
 
 
 class VectorStore:
@@ -10,18 +11,23 @@ class VectorStore:
         self.embeddings_manager = EmbeddingsManager()
         self.db = Chroma(
             persist_directory=persist_directory,
-            embedding_function=self.embeddings_manager.embeddings
+            embedding_function=self.embeddings_manager.embeddings,
+            client_settings=Settings(
+                anonymized_telemetry=False
+            )
         )
 
-    def add_documents(self, documents: List[Document]):
+    def add_documents(self, documents: list[Document]):
         """Add documents to the vector store"""
         self.db.add_documents(documents)
 
-    def similarity_search(self, query: str, k: int = 3) -> List[Document]:
+    def similarity_search(self, query: str, k: int = 3) -> list[Document]:
         """Search for documents most similar to the query"""
         return self.db.similarity_search(query, k=k)
 
     def clear_database(self) -> None:
-        """Delete all documents from the database"""
-        self.db._collection.delete(where={})
-        self.db.persist()
+        """Delete all documents from the database by recreating the collection"""
+        self.db = Chroma(
+            persist_directory=self.persist_directory,
+            embedding_function=self.embeddings_manager.embeddings
+        )

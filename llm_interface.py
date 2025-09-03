@@ -1,6 +1,7 @@
 from langchain.llms import Ollama
 from langchain import PromptTemplate, LLMChain
 
+
 class LLMInterface:
     def __init__(self, model_name: str = "llama2"):
         self.llm = Ollama(model=model_name)
@@ -9,12 +10,12 @@ class LLMInterface:
             template="""
             Based on the following context, answer the question.
             Use only information provided in the context.
-            
+
             Context:
             {context}
-            
+
             Question: {question}
-            
+
             Answer:"""
         )
         self.chain = LLMChain(llm=self.llm, prompt=self.prompt_template)

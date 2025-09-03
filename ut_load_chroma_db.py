@@ -1,6 +1,8 @@
 import logging
+import shutil
+from time import perf_counter
 
-from vectore_store import VectorStore
+from vector_store import VectorStore
 from document_processor import DocumentProcessor
 
 logger = logging.getLogger(__name__)
@@ -11,7 +13,24 @@ if __name__ == "__main__":
         level=logging.INFO)
     logger.info("start")
 
-    vs = VectorStore(persist_directory="./chroma_db")
-    vs.clear_database()
+    chroma_dir = "./chroma_db"
+    file_pdf = "../resources/Documento VN.pdf"
 
+    shutil.rmtree(chroma_dir)
+
+    ts = perf_counter()
+    vs = VectorStore(persist_directory=chroma_dir)
+    logger.info(f"VectorStore creation: {perf_counter()-ts} sec")
+
+    ts = perf_counter()
     dp = DocumentProcessor()
+    logger.info(f"DocumentProcessor creation: {perf_counter()-ts} sec")
+
+    ts = perf_counter()
+    results = list(dp.process_large_pdf(file_pdf))
+    for enne, doc in enumerate(results):
+        if enne % 10 == 0:
+            logger.info(f'step {enne} / {len(results)}')
+        vs.add_documents([doc, ])
+
+    logger.info(f"add_documents for {enne+1} docs {perf_counter()-ts}")
