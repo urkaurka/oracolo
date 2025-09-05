@@ -1,4 +1,3 @@
-import shutil
 from langchain_chroma import Chroma
 from langchain.schema import Document
 from chromadb.config import Settings
@@ -25,7 +24,6 @@ class VectorStore:
         return self.db.similarity_search(query, k=k)
 
     def clear_database(self) -> None:
-        shutil.rmtree(self.persist_directory)
         self.db = Chroma(
             persist_directory=self.persist_directory,
             embedding_function=self.embeddings_manager.embeddings

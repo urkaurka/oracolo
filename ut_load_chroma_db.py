@@ -1,10 +1,12 @@
 import logging
 from time import perf_counter
 from pathlib import Path
+import shutil
+
 
 from vector_store import VectorStore
 from document_processor import DocumentProcessor
-from config_manager import ConfigManager
+from config_manager import config
 
 logger = logging.getLogger(__name__)
 
@@ -14,20 +16,20 @@ if __name__ == "__main__":
         level=logging.INFO)
     logger.info("start")
 
-    # Load configuration
-    config = ConfigManager()
-
     ts = perf_counter()
+    chroma_path = Path(config.chroma_dir)
+    if chroma_path.exists():
+        shutil.rmtree(config.chroma_dir)
+    chroma_path.mkdir()
+
     vs = VectorStore(persist_directory=config.chroma_dir)
-    vs.clear_database()
     logger.info(f"VectorStore creation: {perf_counter()-ts} sec")
 
     ts = perf_counter()
     dp = DocumentProcessor()
     logger.info(f"DocumentProcessor creation: {perf_counter()-ts} sec")
 
-    # Construct PDF path
-    pdf_path = Path(config.pdf_resources_dir) / "Documento VN.pdf"
+    pdf_path = Path(config.pdf_resources_dir) / "Cane perfetto con tanto affetto - Steve Mann.pdf"
 
     ts = perf_counter()
     results = list(dp.process_large_pdf(str(pdf_path)))
