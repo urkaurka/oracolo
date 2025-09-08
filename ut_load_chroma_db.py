@@ -1,4 +1,5 @@
 import logging
+import json
 from time import perf_counter
 from pathlib import Path
 import shutil
@@ -29,13 +30,9 @@ if __name__ == "__main__":
     dp = DocumentProcessor()
     logger.info(f"DocumentProcessor creation: {perf_counter()-ts} sec")
 
-    pdf_path = Path(config.pdf_resources_dir) / "Cane perfetto con tanto affetto - Steve Mann.pdf"
-
+    json_dir = Path("../web_scraping/scraper_project/scraper_project/_data")
     ts = perf_counter()
-    results = list(dp.process_large_pdf(str(pdf_path)))
-    for enne, doc in enumerate(results):
-        if enne % 10 == 0:
-            logger.info(f'step {enne} / {len(results)}')
-        vs.add_documents([doc, ])
-
-    logger.info(f"add_documents for {enne+1} docs {perf_counter()-ts}")
+    for enne, file_json in enumerate(json_dir.iterdir()):
+        print(f"{enne: 2d} - {file_json.name}")
+        documents = dp.load_and_split_json(file_json)
+        vs.add_documents(documents)
