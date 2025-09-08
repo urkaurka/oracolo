@@ -1,3 +1,4 @@
+from pprint import pprint
 import logging
 import json
 from time import perf_counter
@@ -22,6 +23,7 @@ if __name__ == "__main__":
     if chroma_path.exists():
         shutil.rmtree(config.chroma_dir)
     chroma_path.mkdir()
+    logger.info("reset chroma db")
 
     vs = VectorStore(persist_directory=config.chroma_dir)
     logger.info(f"VectorStore creation: {perf_counter()-ts} sec")
@@ -35,4 +37,9 @@ if __name__ == "__main__":
     for enne, file_json in enumerate(json_dir.iterdir()):
         print(f"{enne: 2d} - {file_json.name}")
         documents = dp.load_and_split_json(file_json)
+        for enne, doc in enumerate(documents):
+            doc.metadata = {
+                "from_file": file_json.name,
+                "pos": enne
+            }
         vs.add_documents(documents)

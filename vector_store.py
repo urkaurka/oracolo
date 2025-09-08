@@ -48,3 +48,19 @@ class VectorStore:
         except Exception as e:
             print(f"Error retrieving document {doc_id}: {str(e)}")
             return None
+
+    def get_documents_by_metadata(self, key: str, value: str) -> list[Document]:
+        try:
+            results = self.db._collection.get(
+                where={key: value},
+                include=['documents', 'metadatas']
+            )
+
+            documents = [
+                Document(page_content=doc, metadata=meta)
+                for doc, meta in zip(results['documents'], results['metadatas'])
+            ]
+            return documents
+        except Exception as e:
+            print(f"Error retrieving documents with metadata {key}={value}: {str(e)}")
+            return []
