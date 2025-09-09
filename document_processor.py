@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import spacy
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import TextLoader, PyPDFLoader
 from langchain.schema import Document
@@ -14,6 +15,8 @@ class DocumentProcessor:
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap
         )
+        # Carica il modello di spaCy per l'italiano
+        self.nlp = spacy.load("it_core_news_sm")
 
     def load_and_split(self, file_path: str) -> list[Document]:
         """Load a document and split it into chunks"""
@@ -46,3 +49,7 @@ class DocumentProcessor:
         text = f'{data["title"]}\n\n{data["text"]}'
         documents = [Document(page_content=text)]
         return self.text_splitter.split_documents(documents)
+
+    def split_into_sentences(self, text: str) -> List[str]:
+        doc = self.nlp(text)
+        return [sent.text.strip() for sent in doc.sents]
